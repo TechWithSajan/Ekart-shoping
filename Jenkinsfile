@@ -48,6 +48,7 @@ pipeline {
                                     odcInstallation: 'DC'
             }
         }
+        }
 
         stage('Build') {
             steps {

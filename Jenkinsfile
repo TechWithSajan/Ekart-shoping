@@ -3,99 +3,103 @@ pipeline {
 
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
-        NVD_API_KEY = credentials('nvd-api-key')  // Jenkins secret text credential
     }
 
     tools {
         maven 'maven3'
-        jdk 'jdk-21'
+        jdk 'jdk-17'
     }
 
     stages {
-        stage('git checkout') {
+
+        stage('Git Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/TechWithSajan/Ekart-shoping.git'
             }
         }
 
-        stage('compile') {
+        stage('Compile') {
             steps {
-                sh "mvn compile"
+                sh 'mvn clean compile'
             }
         }
 
-        stage('unit tests') {
+        stage('Unit Test') {
             steps {
-                sh "mvn test -DskipTests=true"
+                sh 'mvn test -DskipTests=true'
             }
         }
 
-        stage('SonarQube analysis') {
+        stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
-                    sh "${env.SCANNER_HOME}/bin/sonar-scanner \
-                        -Dsonar.projectKey=Ekart-shoping \
-                        -Dsonar.projectName=Ekart-shoping \
-                        -Dsonar.java.binaries=target/classes"
+                    sh '''
+                    $SCANNER_HOME/bin/sonar-scanner \
+                    -Dsonar.projectKey=Ekart-shoping \
+                    -Dsonar.projectName=Ekart-shoping \
+                    -Dsonar.java.binaries=target/classes
+                    '''
                 }
             }
         }
 
         stage('OWASP Dependency Check') {
             steps {
-                  withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
-                    dependencyCheck additionalArguments: "--nvdApiKey=$NVD_API_KEY",
-                                    odcInstallation: 'DC'
+                dependencyCheck odcInstallation: 'DC'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
-        }
 
-        stage('Build') {
+        stage('Build Artifact') {
             steps {
-                sh "mvn package -DskipTests=true"
+                sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('deploy to Nexus') {
+        stage('Deploy to Nexus') {
             steps {
-                withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk-21', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
-                    sh "mvn deploy -DskipTests=true"
+                withMaven(
+                    maven: 'maven3',
+                    jdk: 'jdk-17',
+                    globalMavenSettingsConfig: 'global-maven'
+                ) {
+                    sh 'mvn deploy -DskipTests'
                 }
             }
         }
 
-
-        stage('build and Tag docker image') {
+        stage('Build Docker Image') {
             steps {
-                script {
-                        sh "docker build -t techdatainfinity/ekart-shoping:latest -f docker/Dockerfile ."
-                    }
+                sh 'docker build -t techdatainfinity/ekart-shoping:latest .'
             }
         }
 
-        stage('Push image to Hub'){
-            steps{
-                script{
-                   withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
-                   sh 'docker login -u techdatainfinity -p ${dockerhubpwd}'}
-                   sh 'docker push techdatainfinity/ekart-shoping:latest'
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                    docker login -u $DOCKER_USER -p $DOCKER_PASS
+                    docker push techdatainfinity/ekart-shoping:latest
+                    '''
                 }
             }
         }
-        stage('EKS and Kubectl configuration'){
-            steps{
-                script{
-                    sh 'aws eks update-kubeconfig --region ap-south-1 --name Tech-data-cluster'
-                }
+
+        stage('Configure EKS') {
+            steps {
+                sh 'aws eks update-kubeconfig --region ap-south-1 --name Tech-data-cluster'
             }
         }
-        stage('Deploy to k8s'){
-            steps{
-                script{
-                    sh 'kubectl apply -f deploymentservice.yml'
-                }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh 'kubectl apply -f deploymentservice.yml'
             }
         }
+
     }
-
 }

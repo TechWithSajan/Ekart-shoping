@@ -3,12 +3,12 @@ pipeline {
 
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
-        NVD_API_KEY = credentials('nvd-api-key')  // Jenkins secret text credential
+        NVD_API_KEY = credentials('nvd-api-key')
     }
 
     tools {
         maven 'maven3'
-        jdk 'Jdk-17'
+        jdk 'jdk-17'
     }
 
     stages {
@@ -25,9 +25,9 @@ pipeline {
             }
         }
 
-        stage('unit tests') {
+        stage('Unit Tests') {
             steps {
-                sh "mvn test -DskipTests=true"
+                sh "mvn test"
             }
         }
 
@@ -46,11 +46,11 @@ pipeline {
 
         stage('OWASP Dependency Check') {
             steps {
-                  withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+                withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
                     dependencyCheck additionalArguments: "--nvdApiKey=$NVD_API_KEY",
                                     odcInstallation: 'DC'
-             }
-        }
+                }
+            }
         }
 
         stage('Build Artifact') {
@@ -63,7 +63,7 @@ pipeline {
             steps {
                 withMaven(
                     maven: 'maven3',
-                    jdk: 'Jdk-17',
+                    jdk: 'jdk-17',
                     globalMavenSettingsConfig: 'global-maven'
                 ) {
                     sh "mvn clean deploy -DskipTests=true"

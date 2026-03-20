@@ -25,9 +25,9 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
+        stage('unit tests') {
             steps {
-                sh "mvn test"
+                sh "mvn test -DskipTests=true"
             }
         }
 

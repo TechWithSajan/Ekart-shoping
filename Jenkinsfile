@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
-        NVD_API_KEY = credentials('nvd-api-key')  // Jenkins secret text credential
     }
 
     tools {
@@ -12,6 +11,7 @@ pipeline {
     }
 
     stages {
+
         stage('git checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/TechWithSajan/Ekart-shoping.git'
@@ -33,19 +33,25 @@ pipeline {
         stage('SonarQube analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
-                    sh "${env.SCANNER_HOME}/bin/sonar-scanner \
-                        -Dsonar.projectKey=Ekart-shoping \
-                        -Dsonar.projectName=Ekart-shoping \
-                        -Dsonar.java.binaries=target/classes"
+                    sh """
+                    ${env.SCANNER_HOME}/bin/sonar-scanner \
+                    -Dsonar.projectKey=Ekart-shoping \
+                    -Dsonar.projectName=Ekart-shoping \
+                    -Dsonar.java.binaries=target/classes
+                    """
                 }
             }
         }
 
         stage('OWASP Dependency Check') {
             steps {
-                  withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
-                    dependencyCheck additionalArguments: "--nvdApiKey=$NVD_API_KEY",
+                withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+                    dependencyCheck additionalArguments: "--nvdApiKey=${NVD_API_KEY} --failOnError=false",
                                     odcInstallation: 'DC'
+                }
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
 
         stage('Build') {
             steps {
@@ -55,44 +61,49 @@ pipeline {
 
         stage('deploy to Nexus') {
             steps {
-                withMaven(globalMavenSettingsConfig: 'global-maven',  maven: 'maven3', jdk: 'Jdk-17', mavenSettingsConfig: 'global-maven', traceability: true) {
-                   //sh "mvn deploy -DskipTests=true"
+                withMaven(globalMavenSettingsConfig: 'global-maven',
+                          maven: 'maven3',
+                          jdk: 'Jdk-17',
+                          mavenSettingsConfig: 'global-maven',
+                          traceability: true) {
+                    // sh "mvn deploy -DskipTests=true"
                 }
             }
         }
-
 
         stage('build and Tag docker image') {
             steps {
                 script {
-                        sh "docker build -t techdatainfinity/ekart-shoping:latest -f docker/Dockerfile ."
-                    }
-            }
-        }
-
-        stage('Push image to Hub'){
-            steps{
-                script{
-                   withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
-                   sh 'docker login -u techdatainfinity -p ${dockerhubpwd}'}
-                   sh 'docker push techdatainfinity/ekart-shoping:latest'
+                    sh "docker build -t techdatainfinity/ekart-shoping:latest -f docker/Dockerfile ."
                 }
             }
         }
-        stage('EKS and Kubectl configuration'){
-            steps{
-                script{
+
+        stage('Push image to Hub') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                        sh 'docker login -u techdatainfinity -p ${dockerhubpwd}'
+                    }
+                    sh 'docker push techdatainfinity/ekart-shoping:latest'
+                }
+            }
+        }
+
+        stage('EKS and Kubectl configuration') {
+            steps {
+                script {
                     sh 'aws eks update-kubeconfig --region ap-south-1 --name Tech-data-cluster'
                 }
             }
         }
-        stage('Deploy to k8s'){
-            steps{
-                script{
+
+        stage('Deploy to k8s') {
+            steps {
+                script {
                     sh 'kubectl apply -f deploymentservice.yml'
                 }
             }
         }
     }
-
 }

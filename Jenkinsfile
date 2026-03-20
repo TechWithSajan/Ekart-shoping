@@ -8,7 +8,7 @@ pipeline {
 
     tools {
         maven 'maven3'
-        jdk 'jdk-17'
+        jdk 'Jdk-17'
     }
 
     stages {
@@ -63,7 +63,7 @@ pipeline {
             steps {
                 withMaven(
                     maven: 'maven3',
-                    jdk: 'jdk-17',
+                    jdk: 'Jdk-17',
                     globalMavenSettingsConfig: 'global-maven'
                 ) {
                     sh "mvn clean deploy -DskipTests=true"

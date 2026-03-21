@@ -34,6 +34,14 @@
 </p>
 
 ---
+___________
+
+## 🏗️ Architecture Diagram
+
+<p align="center">
+  <img src="./images/architecture.png" alt="DevSecOps Architecture" width="800"/>
+</p>
+___________
 
 ## 📌 Project Overview
 

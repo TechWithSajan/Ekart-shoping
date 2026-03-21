@@ -1,4 +1,4 @@
-# 🚀 CI/CD Pipeline Project – Jenkins + SonarQube + Nexus + Docker + EKS
+# 🚀 DevSecOps CI/CD Pipeline with Security & Kubernetes Deployment
 
 ![CI/CD](https://img.shields.io/badge/CI-CD%20Pipeline-blue)
 ![Jenkins](https://img.shields.io/badge/Jenkins-Automation-red)

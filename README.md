@@ -105,10 +105,14 @@ docker run -d -p 8081:8081 sonatype/nexus3
 Retrieve admin password:
 
 ```bash
-# docker ps --> find the container 
 
-# docker exec -it 6dba1b14e8f5 /bin/bash
+login the nexus instnace 
 
+docker ps --> find the container
+
+docker exec -it <container_id> /bin/bash
+
+docker exec -it 6dba1b14e8f5 /bin/bash
 
 bash-4.4$ cd /nexus-data/
 bash-4.4$ cat admin.password
@@ -116,10 +120,9 @@ bash-4.4$ cat admin.password
 5c3bfc44-0df7-46d0-8cae-3ec0d5264e8d
 
 Nexus uid : admin
-Pwd : Parth@123456
+New Pwd : ****
 
-docker exec -it <container_id> /bin/bash
-cat /nexus-data/admin.password
+
 ```
 
 ---

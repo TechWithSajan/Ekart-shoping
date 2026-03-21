@@ -1,12 +1,18 @@
-# 🚀 End-to-End CI/CD Implementation Guide
+# 🚀 CI/CD Pipeline Project – Jenkins + SonarQube + Nexus + Docker + EKS
 
-**Jenkins + SonarQube + Nexus + Docker + EKS (Kubernetes)**
+![CI/CD](https://img.shields.io/badge/CI-CD%20Pipeline-blue)
+![Jenkins](https://img.shields.io/badge/Jenkins-Automation-red)
+![Docker](https://img.shields.io/badge/Docker-Containerization-blue)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestration-blue)
+![AWS](https://img.shields.io/badge/AWS-EKS-orange)
 
 ---
 
-## 📌 Architecture Overview
+## 📌 Project Overview
 
-E:\Sajan\TDI\Tech-data\Sep_Batch_2\DevSecOps-Project-implement
+This project demonstrates a complete **End-to-End CI/CD Pipeline** for a Java-based application using modern DevOps tools.
+
+### 🔄 Pipeline Flow
 
 ```
 GitHub → Jenkins → SonarQube → OWASP → Nexus → Docker → Kubernetes (EKS)
@@ -14,17 +20,29 @@ GitHub → Jenkins → SonarQube → OWASP → Nexus → Docker → Kubernetes (
 
 ---
 
-## 🖥️ STEP 1: Launch Infrastructure
+## 🧱 Architecture
 
-Create **3 Ubuntu EC2 instances (t3.medium):**
-
-* Jenkins Server
-* SonarQube Server
-* Nexus Server
+* **Source Code**: GitHub
+* **CI/CD Tool**: Jenkins
+* **Code Quality**: SonarQube
+* **Security Scan**: OWASP Dependency Check
+* **Artifact Repository**: Nexus
+* **Containerization**: Docker
+* **Orchestration**: Kubernetes (AWS EKS)
 
 ---
 
-## ⚙️ STEP 2: Setup Jenkins Server
+## 🖥️ Infrastructure Setup
+
+| Component | Instance Type | OS     |
+| --------- | ------------- | ------ |
+| Jenkins   | t3.medium     | Ubuntu |
+| SonarQube | t3.medium     | Ubuntu |
+| Nexus     | t3.medium     | Ubuntu |
+
+---
+
+## ⚙️ Jenkins Setup
 
 ### Install Java & Jenkins
 
@@ -32,10 +50,6 @@ Create **3 Ubuntu EC2 instances (t3.medium):**
 sudo apt update -y
 sudo apt install openjdk-17-jdk -y
 
-java -version
-```
-
-```bash
 wget -O /usr/share/keyrings/jenkins-keyring.asc \
 https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
 
@@ -52,7 +66,7 @@ sudo systemctl enable jenkins
 
 ---
 
-### Install Docker on Jenkins
+### Install Docker
 
 ```bash
 sudo apt install docker.io -y
@@ -62,55 +76,35 @@ sudo systemctl restart docker
 
 ---
 
-## 🔍 STEP 3: Setup SonarQube Server
+## 🔍 SonarQube Setup
 
 ```bash
-sudo apt update -y
-sudo apt install docker.io -y
-
 docker pull sonarqube:latest
-docker run -d -p 9000:9000 sonarqube:latest
+docker run -d -p 9000:9000 sonarqube
 ```
 
-Access:
-
-```
-http://<sonar-ip>:9000
-```
-
-* Username: admin
-* Password: admin → change password
+👉 Access: `http://<sonar-ip>:9000`
 
 ---
 
-## 📦 STEP 4: Setup Nexus Repository
+## 📦 Nexus Setup
 
 ```bash
-sudo apt update -y
-sudo apt install docker.io -y
-
 docker run -d -p 8081:8081 sonatype/nexus3
 ```
 
-### Get Nexus Password
+Retrieve admin password:
 
 ```bash
-docker ps
 docker exec -it <container_id> /bin/bash
 cat /nexus-data/admin.password
 ```
 
-Access:
-
-```
-http://<nexus-ip>:8081
-```
-
 ---
 
-## 🔌 STEP 5: Configure Jenkins Plugins
+## 🔌 Jenkins Plugins
 
-Install the following plugins:
+Install:
 
 * SonarQube Scanner
 * Nexus Artifact Uploader
@@ -121,21 +115,16 @@ Install the following plugins:
 
 ---
 
-## 🧰 STEP 6: Configure Jenkins Tools
+## 🧰 Jenkins Tool Configuration
 
-Go to: **Manage Jenkins → Global Tool Configuration**
+| Tool            | Name          |
+| --------------- | ------------- |
+| JDK             | jdk-17        |
+| Maven           | maven3        |
+| Sonar Scanner   | sonar-scanner |
+| DependencyCheck | DC            |
 
-Add:
-
-* JDK → `jdk-17`
-* Maven → `maven3`
-* Sonar Scanner → `sonar-scanner`
-* Dependency Check → `DC`
-
-⚠️ Important:
-
-* Do NOT use auto-install for JDK
-* Set manual path:
+⚠️ Use manual JDK path:
 
 ```
 /usr/lib/jvm/java-17-openjdk-amd64
@@ -143,42 +132,26 @@ Add:
 
 ---
 
-## 🔐 STEP 7: Add Credentials in Jenkins
+## 🔐 Credentials Setup
 
-Add the following credentials:
-
-### Sonar Token
-
-* ID: `sonar-token`
-
-### DockerHub Password
-
-* ID: `dockerhub-pwd`
-
-### NVD API Key
-
-* ID: `nvd-api-key`
-
-Generate API Key:
-https://nvd.nist.gov/developers/request-an-api-key
+| Credential         | ID            |
+| ------------------ | ------------- |
+| Sonar Token        | sonar-token   |
+| DockerHub Password | dockerhub-pwd |
+| NVD API Key        | nvd-api-key   |
 
 ---
 
-## 🔗 STEP 8: Integrations
+## 🔗 Integrations
 
-### SonarQube Integration
+### SonarQube
 
-Manage Jenkins → System
-
-* Name: `sonar`
 * URL: `http://<sonar-ip>:9000`
 * Token: `sonar-token`
 
 ---
 
-### Nexus Integration
-
-#### Update `pom.xml`
+### Nexus (pom.xml)
 
 ```xml
 <distributionManagement>
@@ -191,25 +164,7 @@ Manage Jenkins → System
 
 ---
 
-#### Jenkins Managed File (settings.xml)
-
-```xml
-<server>
-  <id>maven-releases</id>
-  <username>admin</username>
-  <password>******</password>
-</server>
-
-<server>
-  <id>maven-snapshots</id>
-  <username>admin</username>
-  <password>******</password>
-</server>
-```
-
----
-
-## 🐳 STEP 9: Docker Setup
+## 🐳 Docker Workflow
 
 ```bash
 docker build -t techdatainfinity/ekart-shoping .
@@ -219,31 +174,16 @@ docker push techdatainfinity/ekart-shoping
 
 ---
 
-## ☸️ STEP 10: Setup EKS Cluster
-
-Use repository:
-
-```
-https://github.com/TechWithSajan/EKS-cluster-deployment.git
-```
-
-### Configure kubectl
+## ☸️ Kubernetes (EKS Setup)
 
 ```bash
 aws eks update-kubeconfig --region ap-south-1 --name Tech-data-cluster
-```
-
----
-
-## 🚀 STEP 11: Deploy to Kubernetes
-
-```bash
 kubectl apply -f deploymentservice.yml
 ```
 
 ---
 
-## 📊 Useful Kubernetes Commands
+## 📊 Useful Commands
 
 ```bash
 kubectl get nodes
@@ -255,15 +195,15 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 
 ---
 
-## 🔄 STEP 12: Jenkins Pipeline Flow
+## 🔄 Jenkins Pipeline Stages
 
-1. Git Checkout
-2. Compile
+1. Checkout Code
+2. Build (Maven)
 3. Test
 4. SonarQube Analysis
 5. OWASP Scan
-6. Build JAR
-7. Deploy to Nexus
+6. Package Artifact
+7. Upload to Nexus
 8. Build Docker Image
 9. Push to DockerHub
 10. Deploy to EKS
@@ -272,25 +212,24 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 
 ## ⚠️ Troubleshooting
 
-### JDK Error
+### ❌ JDK Installation Error
 
-* Remove `openjdk-21-jre`
-* Use only `jdk-17`
+* Avoid auto-install
 * Configure manually
 
 ---
 
-### OWASP 403 Error
+### ❌ OWASP 403 Error
 
 Add API key:
 
 ```bash
---nvdApiKey <your-key>
+--nvdApiKey=<your-key>
 ```
 
 ---
 
-### Nexus 401 Unauthorized
+### ❌ Nexus 401 Error
 
 * Verify credentials in:
 
@@ -300,23 +239,33 @@ Add API key:
 
 ---
 
-## ✅ Final Outcome
+## 📁 Repositories
 
-* Code pushed → Pipeline triggered
-* Build + Scan completed
-* Artifact stored in Nexus
-* Docker image pushed
-* Application deployed to Kubernetes (EKS)
+* 🔗 Application:
+  https://github.com/TechWithSajan/Ekart-shoping
 
----
-
-## 📁 Project Repository
-
-* App Repo: https://github.com/TechWithSajan/Ekart-shoping.git
-* Infra Repo: https://github.com/TechWithSajan/EKS-cluster-deployment.git
+* 🔗 EKS Setup:
+  https://github.com/TechWithSajan/EKS-cluster-deployment
 
 ---
 
-## 🎯 Author
+## 🎯 Key Features
 
-**TechDataInfinity CI/CD Implementation**
+✅ Fully automated CI/CD pipeline
+✅ Code quality analysis
+✅ Security scanning
+✅ Artifact management
+✅ Containerized deployment
+✅ Kubernetes orchestration
+
+---
+
+## 👨‍💻 Author
+
+**TechDataInfinity DevOps Project**
+
+---
+
+## ⭐ Support
+
+If you like this project, give it a ⭐ on GitHub!

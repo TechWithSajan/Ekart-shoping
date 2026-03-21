@@ -6,6 +6,8 @@
 
 ## 📌 Architecture Overview
 
+E:\Sajan\TDI\Tech-data\Sep_Batch_2\DevSecOps-Project-implement
+
 ```
 GitHub → Jenkins → SonarQube → OWASP → Nexus → Docker → Kubernetes (EKS)
 ```

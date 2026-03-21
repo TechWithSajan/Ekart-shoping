@@ -10,7 +10,7 @@
 
 ## 📌 Project Overview
 
-This project demonstrates a complete **End-to-End CI/CD Pipeline** for a Java-based application using modern DevOps tools.
+This DevSecOps project demonstrates a complete **End-to-End CI/CD Pipeline** for a secure Java-based application using modern DevOps tools.
 
 ### 🔄 Pipeline Flow
 
@@ -47,7 +47,7 @@ GitHub → Jenkins → SonarQube → OWASP → Nexus → Docker → Kubernetes (
 ### Install Java & Jenkins
 
 ```bash
-sudo apt update -y
+sudo apt update
 sudo apt install openjdk-17-jdk -y
 
 wget -O /usr/share/keyrings/jenkins-keyring.asc \
@@ -82,6 +82,14 @@ sudo systemctl restart docker
 docker pull sonarqube:latest
 docker run -d -p 9000:9000 sonarqube
 ```
+1st time UI Acsses using below credential 
+
+# username :- admin
+# default pwd : admin
+
+and Set new pwd 
+New pwd : *******
+
 
 👉 Access: `http://<sonar-ip>:9000`
 

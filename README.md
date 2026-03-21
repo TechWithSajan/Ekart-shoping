@@ -1,12 +1,5 @@
-# 🚀 DevSecOps CI/CD Pipeline with Security & Kubernetes Deployment
 
-![CI/CD](https://img.shields.io/badge/CI-CD%20Pipeline-blue)
-![Jenkins](https://img.shields.io/badge/Jenkins-Automation-red)
-![Docker](https://img.shields.io/badge/Docker-Containerization-blue)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestration-blue)
-![AWS](https://img.shields.io/badge/AWS-EKS-orange)
-
-<h1 align="center">🚀 DevSecOps CI/CD Pipeline Project</h1>
+<h1 align="center">🚀 🚀 DevSecOps CI/CD Pipeline with Security & Kubernetes Deployment Project</h1>
 
 <p align="center">
   <b>End-to-End Secure CI/CD Pipeline with Jenkins, SonarQube, Nexus, Docker & Kubernetes (EKS)</b>

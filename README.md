@@ -6,6 +6,40 @@
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestration-blue)
 ![AWS](https://img.shields.io/badge/AWS-EKS-orange)
 
+<h1 align="center">🚀 DevSecOps CI/CD Pipeline Project</h1>
+
+<p align="center">
+  <b>End-to-End Secure CI/CD Pipeline with Jenkins, SonarQube, Nexus, Docker & Kubernetes (EKS)</b>
+</p>
+
+<p align="center">
+
+  <!-- CI/CD & Automation -->
+  <img src="https://img.shields.io/badge/CI-CD%20Pipeline-blue?style=for-the-badge&logo=jenkins&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Jenkins-Automation-red?style=for-the-badge&logo=jenkins&logoColor=white"/>
+
+  <!-- Code & Build -->
+  <img src="https://img.shields.io/badge/GitHub-Source%20Code-black?style=for-the-badge&logo=github"/>
+  <img src="https://img.shields.io/badge/Git-Version%20Control-orange?style=for-the-badge&logo=git"/>
+  <img src="https://img.shields.io/badge/Maven-Build%20Tool-red?style=for-the-badge&logo=apachemaven"/>
+  <img src="https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk"/>
+
+  <!-- Security -->
+  <img src="https://img.shields.io/badge/SonarQube-Code%20Quality-brightgreen?style=for-the-badge&logo=sonarqube"/>
+  <img src="https://img.shields.io/badge/OWASP-Security%20Scan-yellowgreen?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Dependency%20Check-Vulnerability%20Scan-orange?style=for-the-badge"/>
+
+  <!-- Artifact & Container -->
+  <img src="https://img.shields.io/badge/Nexus-Artifact%20Repository-blueviolet?style=for-the-badge&logo=sonatype"/>
+  <img src="https://img.shields.io/badge/Docker-Containerization-blue?style=for-the-badge&logo=docker"/>
+  <img src="https://img.shields.io/badge/Docker%20Hub-Registry-blue?style=for-the-badge&logo=docker"/>
+
+  <!-- Deployment -->
+  <img src="https://img.shields.io/badge/Kubernetes-Orchestration-blue?style=for-the-badge&logo=kubernetes"/>
+  <img src="https://img.shields.io/badge/AWS-EKS-orange?style=for-the-badge&logo=amazonaws"/>
+
+</p>
+
 ---
 
 ## 📌 Project Overview

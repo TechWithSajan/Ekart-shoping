@@ -39,7 +39,7 @@ ___________
 ## 🏗️ Architecture Diagram
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TechWithSajan/Ekart-shoping/main/images/architecture.png" width="900"/>
+  <img src="https://raw.githubusercontent.com/TechWithSajan/Ekart-shoping/main/images/architecture.png.jpg" width="900"/>
 </p>
 ___________
 

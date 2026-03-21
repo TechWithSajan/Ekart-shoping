@@ -84,8 +84,8 @@ docker run -d -p 9000:9000 sonarqube
 ```
 1st time UI Acsses using below credential 
 
-# username :- admin
-# default pwd : admin
+username :- admin
+default pwd : admin
 
 and Set new pwd 
 New pwd : *******

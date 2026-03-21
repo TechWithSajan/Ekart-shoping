@@ -78,7 +78,7 @@ sudo apt install jenkins -y
 
 sudo systemctl start jenkins
 sudo systemctl enable jenkins
-```
+
 
 ### Install Docker
 

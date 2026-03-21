@@ -92,10 +92,6 @@ sudo systemctl restart docker
 
 ## 🔍 SonarQube Setup
 
-```bash
-docker pull sonarqube:latest
-docker run -d -p 9000:9000 sonarqube
-```
 1st time UI Acsses using below credential 
 
 👉 Access: `http://<sonar-ip>:9000`
@@ -112,9 +108,6 @@ New pwd : *******
 
 ## 📦 Nexus Setup
 
-```bash
-docker run -d -p 8081:8081 sonatype/nexus3
-```
 
 Retrieve admin password:
 
@@ -283,6 +276,8 @@ Add Line 119 in xml
 
 ================================Shopping-Ekart Deployment ===================================
 
+Create CICD pipeline for E-kart Deployment  
+
 https://github.com/TechWithSajan/Ekart-shoping.git
 
 ---
@@ -299,9 +294,9 @@ kubectl apply -f deploymentservice.yml
 ## 📊 Useful Commands
 
 ```bash
- kubectl get node
- kubectl get pods
- kubectl describe pod 
+kubectl get node
+kubectl get pods
+kubectl describe pod 
 kubectl get all | grep ekart
 kubectl get deployments
 kubectl edit deployment ekart-deployment

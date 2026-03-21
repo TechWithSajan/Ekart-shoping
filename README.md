@@ -276,7 +276,7 @@ http://3.109.5.205:9000/
 
 ---
 
-### Nexus (pom.xml)
+### Update Nexus (pom.xml) & settings.xml
 
 ```xml
 
@@ -286,6 +286,7 @@ Open your project code and edit POM.xml for nexus configuration
 
 http://15.207.85.17:8081
 
+--------------------------------------------------------------------------------------------
 Manage Jenkins -> Managed files -> Add new config -> Global Maven settings.xml->  global-maven
 
 Add Line 119 in xml 

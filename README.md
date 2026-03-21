@@ -56,7 +56,9 @@ https://github.com/TechWithSajan/Ekart-shoping.git
 
 ---
 
-## ⚙️ Jenkins Setup
+## Automation has been created for  Jnekins SonarQube and Nexus Server use the above repo
+
+## ⚙️ Jenkins Setup (just for info) 
 
 ### Install Java & Jenkins
 

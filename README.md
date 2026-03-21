@@ -17,7 +17,22 @@ This DevSecOps project demonstrates a complete **End-to-End CI/CD Pipeline** for
 ```
 GitHub → Jenkins → SonarQube → OWASP → Nexus → Docker → Kubernetes (EKS)
 ```
+---
+## 📁 Repositories
 
+
+Server creation Repo:
+
+https://github.com/TechWithSajan/Server-Creation-Jenkins-Nexus-Sonar.git
+	
+KS Setup:
+https://github.com/TechWithSajan/EKS-cluster-deployment.git
+
+Application Repo:
+https://github.com/TechWithSajan/Ekart-shoping.git
+
+
+---
 ---
 
 ## 🧱 Architecture
@@ -129,14 +144,19 @@ New Pwd : ****
 
 ## 🔌 Jenkins Plugins
 
-Install:
+Go to jenkins - manage jenkins- 
 
-* SonarQube Scanner
-* Nexus Artifact Uploader
-* Docker Pipeline
-* OWASP Dependency Check
-* Eclipse Temurin Installer
-* Pipeline Maven Integration
+Install below Plugins
+
+1. SonarQube Scanner
+2. Nexus Artifact Uploader
+3. Docker
+4. docker-build-step
+5. docker pipeline
+6. OWASP Dependency-Check
+7. Eclipse Temurin installer
+8. Pipeline Maven Integration
+
 
 ---
 
@@ -149,15 +169,21 @@ Install:
 | Sonar Scanner   | sonar-scanner |
 | DependencyCheck | DC            |
 
-⚠️ Use manual JDK path:
+jenkins-> tools-> add Jdk-17 -> install automatically-> Install from adoptium.net -jdk17.09+9
+   
+--> configure scanner - sonar-scanner - default version
 
-```
-/usr/lib/jvm/java-17-openjdk-amd64
-```
+--> maven - maven3  ->   3.6.3
+
+--> dependency check installation - DC - 6.5.1
+
+--> docker - latest
 
 ---
 
-## 🔐 Credentials Setup
+## 🔐 Credentials Setup in Jenkins 
+
+setup as secret text (pwd) and below ID
 
 | Credential         | ID            |
 | ------------------ | ------------- |
@@ -165,37 +191,100 @@ Install:
 | DockerHub Password | dockerhub-pwd |
 | NVD API Key        | nvd-api-key   |
 
+
 ---
 
 ## 🔗 Integrations
 
-### SonarQube
+### SonarQube Sonar -Security
 
 * URL: `http://<sonar-ip>:9000`
 * Token: `sonar-token`
+  
+Go to the Sonar UI portal - >Token >- Admin- Security- Users
+
+Create credentials for sonar-token 
+
+Give the name for token --> sonar-token 
+
+and generate the token and copy 
+
+squ_893ee4e66e059ea3ddebca29132c4b219c61d0f3 
+
+---
+Docker hub integrtion  in jenkins
+
+Docker login
+Docker username : 
+
+Id will be from Devloper code jenkins file 
+
+Secret text : --> docker hub pwd 
+
+ID :  dockerhub-pwd
+
+---
+
+---
+NVD- Api-key credintial :- 
+
+Id : nvd-api-key
+
+Key genarte using below link and create the credinatl in Jenkins 
+
+https://nvd.nist.gov/developers/request-an-api-key
+
+d1aec818-25dd-43d5-8b3f-4384f235e862
+
+---
+---
+
+Jenkins - Sonar - Integration
+
+Manage Jenkins -> System -> SonarQube installations
+
+Name : sonar
+Server -URL :
+http://3.109.5.205:9000/
+
+---
 
 ---
 
 ### Nexus (pom.xml)
 
 ```xml
-<distributionManagement>
-  <snapshotRepository>
-    <id>maven-snapshots</id>
-    <url>http://<nexus-ip>:8081/repository/maven-snapshots/</url>
-  </snapshotRepository>
-</distributionManagement>
+
+Jenkins - Nexus - Integration
+
+Open your project code and edit POM.xml for nexus configuration
+
+http://15.207.85.17:8081
+
+Manage Jenkins -> Managed files -> Add new config -> Global Maven settings.xml->  global-maven
+
+Add Line 119 in xml 
+
+ 
+      <server>
+      <id>maven-releases</id>
+      <username>admin</username>
+      <password>Parth@123456</password>
+      </server>
+
+      <server>
+      <id>maven-snapshots</id>
+      <username>admin</username>
+      <password>Parth@123456</password>
+      </server>
+
 ```
 
 ---
 
-## 🐳 Docker Workflow
+================================Shopping-Ekart Deployment ===================================
 
-```bash
-docker build -t techdatainfinity/ekart-shoping .
-docker login
-docker push techdatainfinity/ekart-shoping
-```
+https://github.com/TechWithSajan/Ekart-shoping.git
 
 ---
 
@@ -211,11 +300,22 @@ kubectl apply -f deploymentservice.yml
 ## 📊 Useful Commands
 
 ```bash
-kubectl get nodes
-kubectl get pods
+ kubectl get node
+ kubectl get pods
+ kubectl describe pod 
+kubectl get all | grep ekart
+kubectl get deployments
+kubectl edit deployment ekart-deployment
 kubectl get svc
 kubectl describe svc ekart-shoping-ssvc
 kubectl get events --sort-by=.metadata.creationTimestamp
+kubectl get svc ekart-shoping-ssvc -o wide
+
+
+kubectl delete deployment ekart-deployment
+kubectl delete service ekart-shoping-ssvc
+
+
 ```
 
 ---
@@ -235,42 +335,8 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 
 ---
 
-## ⚠️ Troubleshooting
 
-### ❌ JDK Installation Error
 
-* Avoid auto-install
-* Configure manually
-
----
-
-### ❌ OWASP 403 Error
-
-Add API key:
-
-```bash
---nvdApiKey=<your-key>
-```
-
----
-
-### ❌ Nexus 401 Error
-
-* Verify credentials in:
-
-  * Jenkins
-  * settings.xml
-  * pom.xml
-
----
-
-## 📁 Repositories
-
-* 🔗 Application:
-  https://github.com/TechWithSajan/Ekart-shoping
-
-* 🔗 EKS Setup:
-  https://github.com/TechWithSajan/EKS-cluster-deployment
 
 ---
 
@@ -291,6 +357,3 @@ Add API key:
 
 ---
 
-## ⭐ Support
-
-If you like this project, give it a ⭐ on GitHub!

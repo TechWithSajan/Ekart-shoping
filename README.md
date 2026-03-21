@@ -22,7 +22,6 @@ GitHub → Jenkins → SonarQube → OWASP → Nexus → Docker → Kubernetes (
 
 
 Server creation Repo:
-
 https://github.com/TechWithSajan/Server-Creation-Jenkins-Nexus-Sonar.git
 	
 KS Setup:

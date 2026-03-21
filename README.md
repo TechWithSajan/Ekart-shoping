@@ -80,8 +80,6 @@ sudo systemctl start jenkins
 sudo systemctl enable jenkins
 ```
 
----
-
 ### Install Docker
 
 ```bash

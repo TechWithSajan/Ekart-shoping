@@ -1,171 +1,320 @@
-# Spring Boot Shopping Cart Web App
+# 🚀 End-to-End CI/CD Implementation Guide
 
-## About
+**Jenkins + SonarQube + Nexus + Docker + EKS (Kubernetes)**
 
-This is a demo project for practicing Spring + Thymeleaf. The idea was to build some basic shopping cart web app.
+---
 
-It was made using **Spring Boot**, **Spring Security**, **Thymeleaf**, **Spring Data JPA**, **Spring Data REST and Docker**. 
-Database is in memory **H2**.
+## 📌 Architecture Overview
 
-
-There is a login and registration functionality included.
-
-Users can shop for products. Each user has his own shopping cart (session functionality).
-Checkout is transactional.
-
-## Configuration
-
-### Configuration Files
-
-Folder **src/resources/** contains config files for **shopping-cart** Spring Boot application.
-
-* **src/resources/application.properties** - main configuration file. Here it is possible to change admin username/password,
-as well as change the port number.
-
-## How to run
-
-There are several ways to run the application. You can run it from the command line with included Maven Wrapper, Maven or Docker. 
-
-Once the app starts, go to the web browser and visit `http://localhost:8070/home`
-
-Admin username: **admin**
-
-Admin password: **admin**
-
-User username: **user**
-
-User password: **password**
-
-### Maven Wrapper
-
-#### Using the Maven Plugin
-
-Go to the root folder of the application and type:
-```bash
-$ chmod +x scripts/mvnw
-$ scripts/mvnw spring-boot:run
+```
+GitHub → Jenkins → SonarQube → OWASP → Nexus → Docker → Kubernetes (EKS)
 ```
 
-#### Using Executable Jar
+---
 
-Or you can build the JAR file with 
+## 🖥️ STEP 1: Launch Infrastructure
+
+Create **3 Ubuntu EC2 instances (t3.medium):**
+
+* Jenkins Server
+* SonarQube Server
+* Nexus Server
+
+---
+
+## ⚙️ STEP 2: Setup Jenkins Server
+
+### Install Java & Jenkins
+
 ```bash
-$ scripts/mvnw clean package
+sudo apt update -y
+sudo apt install openjdk-17-jdk -y
 
-``` 
-
-Then you can run the JAR file:
-```bash
-$ java -jar target/shopping-cart-0.0.1-SNAPSHOT.jar
-```
-
-### Maven
-
-Open a terminal and run the following commands to ensure that you have valid versions of Java and Maven installed:
-
-```bash
-$ java -version
-java version "1.8.0_102"
-Java(TM) SE Runtime Environment (build 1.8.0_102-b14)
-Java HotSpot(TM) 64-Bit Server VM (build 25.102-b14, mixed mode)
+java -version
 ```
 
 ```bash
-$ mvn -v
-Apache Maven 3.3.9 (bb52d8502b132ec0a5a3f4c09453c07478323dc5; 2015-11-10T16:41:47+00:00)
-Maven home: /usr/local/Cellar/maven/3.3.9/libexec
-Java version: 1.8.0_102, vendor: Oracle Corporation
+wget -O /usr/share/keyrings/jenkins-keyring.asc \
+https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+/etc/apt/sources.list.d/jenkins.list > /dev/null
+
+sudo apt update
+sudo apt install jenkins -y
+
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
 ```
 
-#### Using the Maven Plugin
+---
 
-The Spring Boot Maven plugin includes a run goal that can be used to quickly compile and run your application. 
-Applications run in an exploded form, as they do in your IDE. 
-The following example shows a typical Maven command to run a Spring Boot application:
- 
-```bash
-$ mvn spring-boot:run
-``` 
-
-#### Using Executable Jar
-
-To create an executable jar run:
+### Install Docker on Jenkins
 
 ```bash
-$ mvn clean package
-``` 
+sudo apt install docker.io -y
+sudo usermod -aG docker jenkins
+sudo systemctl restart docker
+```
 
-To run that application, use the java -jar command, as follows:
+---
+
+## 🔍 STEP 3: Setup SonarQube Server
 
 ```bash
-$ java -jar target/shopping-cart-0.0.1-SNAPSHOT.jar
+sudo apt update -y
+sudo apt install docker.io -y
+
+docker pull sonarqube:latest
+docker run -d -p 9000:9000 sonarqube:latest
 ```
 
-To exit the application, press **ctrl-c**.
+Access:
 
-### Docker
-
-It is possible to run **shopping-cart** using Docker:
-
-Build Docker image:
-```bash
-$ mvn clean package
-$ docker build -t shopping-cart:dev -f docker/Dockerfile .
+```
+http://<sonar-ip>:9000
 ```
 
-Run Docker container:
-```bash
-$ docker run --rm -i -p 8070:8070 \
-      --name shopping-cart \
-      shopping-cart:dev
-```
+* Username: admin
+* Password: admin → change password
 
-##### Helper script
+---
 
-It is possible to run all of the above with helper script:
+## 📦 STEP 4: Setup Nexus Repository
 
 ```bash
-$ chmod +x scripts/run_docker.sh
-$ scripts/run_docker.sh
+sudo apt update -y
+sudo apt install docker.io -y
+
+docker run -d -p 8081:8081 sonatype/nexus3
 ```
 
-## Docker 
-
-Folder **docker** contains:
-
-* **docker/shopping-cart/Dockerfile** - Docker build file for executing shopping-cart Docker image. 
-Instructions to build artifacts, copy build artifacts to docker image and then run app on proper port with proper configuration file.
-
-## Util Scripts
-
-* **scripts/run_docker.sh.sh** - util script for running shopping-cart Docker container using **docker/Dockerfile**
-
-## Tests
-
-Tests can be run by executing following command from the root of the project:
+### Get Nexus Password
 
 ```bash
-$ mvn test
+docker ps
+docker exec -it <container_id> /bin/bash
+cat /nexus-data/admin.password
 ```
 
-## Helper Tools
+Access:
 
-### HAL REST Browser
-
-Go to the web browser and visit `http://localhost:8070/`
-
-You will need to be authenticated to be able to see this page.
-
-### H2 Database web interface
-
-Go to the web browser and visit `http://localhost:8070/h2-console`
-
-In field **JDBC URL** put 
 ```
-jdbc:h2:mem:shopping_cart_db
+http://<nexus-ip>:8081
 ```
 
-In `/src/main/resources/application.properties` file it is possible to change both
-web interface url path, as well as the datasource url.
+---
 
-##
+## 🔌 STEP 5: Configure Jenkins Plugins
+
+Install the following plugins:
+
+* SonarQube Scanner
+* Nexus Artifact Uploader
+* Docker Pipeline
+* OWASP Dependency Check
+* Eclipse Temurin Installer
+* Pipeline Maven Integration
+
+---
+
+## 🧰 STEP 6: Configure Jenkins Tools
+
+Go to: **Manage Jenkins → Global Tool Configuration**
+
+Add:
+
+* JDK → `jdk-17`
+* Maven → `maven3`
+* Sonar Scanner → `sonar-scanner`
+* Dependency Check → `DC`
+
+⚠️ Important:
+
+* Do NOT use auto-install for JDK
+* Set manual path:
+
+```
+/usr/lib/jvm/java-17-openjdk-amd64
+```
+
+---
+
+## 🔐 STEP 7: Add Credentials in Jenkins
+
+Add the following credentials:
+
+### Sonar Token
+
+* ID: `sonar-token`
+
+### DockerHub Password
+
+* ID: `dockerhub-pwd`
+
+### NVD API Key
+
+* ID: `nvd-api-key`
+
+Generate API Key:
+https://nvd.nist.gov/developers/request-an-api-key
+
+---
+
+## 🔗 STEP 8: Integrations
+
+### SonarQube Integration
+
+Manage Jenkins → System
+
+* Name: `sonar`
+* URL: `http://<sonar-ip>:9000`
+* Token: `sonar-token`
+
+---
+
+### Nexus Integration
+
+#### Update `pom.xml`
+
+```xml
+<distributionManagement>
+  <snapshotRepository>
+    <id>maven-snapshots</id>
+    <url>http://<nexus-ip>:8081/repository/maven-snapshots/</url>
+  </snapshotRepository>
+</distributionManagement>
+```
+
+---
+
+#### Jenkins Managed File (settings.xml)
+
+```xml
+<server>
+  <id>maven-releases</id>
+  <username>admin</username>
+  <password>******</password>
+</server>
+
+<server>
+  <id>maven-snapshots</id>
+  <username>admin</username>
+  <password>******</password>
+</server>
+```
+
+---
+
+## 🐳 STEP 9: Docker Setup
+
+```bash
+docker build -t techdatainfinity/ekart-shoping .
+docker login
+docker push techdatainfinity/ekart-shoping
+```
+
+---
+
+## ☸️ STEP 10: Setup EKS Cluster
+
+Use repository:
+
+```
+https://github.com/TechWithSajan/EKS-cluster-deployment.git
+```
+
+### Configure kubectl
+
+```bash
+aws eks update-kubeconfig --region ap-south-1 --name Tech-data-cluster
+```
+
+---
+
+## 🚀 STEP 11: Deploy to Kubernetes
+
+```bash
+kubectl apply -f deploymentservice.yml
+```
+
+---
+
+## 📊 Useful Kubernetes Commands
+
+```bash
+kubectl get nodes
+kubectl get pods
+kubectl get svc
+kubectl describe svc ekart-shoping-ssvc
+kubectl get events --sort-by=.metadata.creationTimestamp
+```
+
+---
+
+## 🔄 STEP 12: Jenkins Pipeline Flow
+
+1. Git Checkout
+2. Compile
+3. Test
+4. SonarQube Analysis
+5. OWASP Scan
+6. Build JAR
+7. Deploy to Nexus
+8. Build Docker Image
+9. Push to DockerHub
+10. Deploy to EKS
+
+---
+
+## ⚠️ Troubleshooting
+
+### JDK Error
+
+* Remove `openjdk-21-jre`
+* Use only `jdk-17`
+* Configure manually
+
+---
+
+### OWASP 403 Error
+
+Add API key:
+
+```bash
+--nvdApiKey <your-key>
+```
+
+---
+
+### Nexus 401 Unauthorized
+
+* Verify credentials in:
+
+  * Jenkins
+  * settings.xml
+  * pom.xml
+
+---
+
+## ✅ Final Outcome
+
+* Code pushed → Pipeline triggered
+* Build + Scan completed
+* Artifact stored in Nexus
+* Docker image pushed
+* Application deployed to Kubernetes (EKS)
+
+---
+
+## 📁 Project Repository
+
+* App Repo: https://github.com/TechWithSajan/Ekart-shoping.git
+* Infra Repo: https://github.com/TechWithSajan/EKS-cluster-deployment.git
+
+---
+
+## 🎯 Author
+
+**TechDataInfinity CI/CD Implementation**

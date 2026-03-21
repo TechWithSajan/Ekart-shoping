@@ -1,5 +1,5 @@
 
-<h1 align="center">🚀 🚀 DevSecOps CI/CD Pipeline with Security & Kubernetes Deployment Project</h1>
+<h1 align="center"> 🚀 DevSecOps CI/CD Pipeline with Security & Kubernetes Deployment Project 🚀 </h1>
 
 <p align="center">
   <b>End-to-End Secure CI/CD Pipeline with Jenkins, SonarQube, Nexus, Docker & Kubernetes (EKS)</b>

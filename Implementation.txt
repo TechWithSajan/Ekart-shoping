@@ -1,0 +1,234 @@
+
+
+
+
+#####################################Implementation###################################################
+
+https://github.com/TechWithSajan/Server-Creation-Jenkins-Nexus-Sonar.git
+
+
+3 Tier - Java Based Application
+
+	1) Jenkins             2) SonarQube                    3)Nexus 
+	
+
+
+
+launch instance 3 ubuntu, T3- Medium 
+
+#########################--------------------Jenkins------------------------------##################
+
+# apt install openjdk-17-jre-headless
+
+sudo apt update -y
+sudo apt install openjdk-17-jdk -y
+
+java -version
+
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+
+
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+/etc/apt/sources.list.d/jenkins.list > /dev/null
+
+sudo apt update
+sudo apt install jenkins -y
+
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+
+sudo systemctl status jenkins
+
+
+
+install docker on jenkins 
+
+# apt install docker.io -y
+
+
+#########################--------------------Sonar------------------------------##################
+
+install sonar by using docker
+
+# apt update -y
+# apt install docker.io -y
+
+
+# docker pull sonarqube:latest
+# docker run -d -p 9000:9000 sonarqube:latest
+
+# username :- admin
+# default pwd : admin
+
+New pwd : Parth@123456
+
+
+##################---------------------------- install nexus--------------------------- ##########################
+# apt update -y 
+ Install docker
+
+# apt install docker.io -y
+
+# docker run -d -p 8081:8081 sonatype/nexus3
+
+
+# docker ps --> find the container 
+
+# docker exec -it 6dba1b14e8f5 /bin/bash
+
+
+bash-4.4$ cd /nexus-data/
+bash-4.4$ cat admin.password
+
+5c3bfc44-0df7-46d0-8cae-3ec0d5264e8d
+
+Nexus uid : admin
+Pwd : Parth@123456
+
+
+#############################------------------------On jenkins-------------------------##################################
+
+
+Go to jenkins - manage jenkins- 
+
+Install below Plugins
+
+1. SonarQube Scanner
+2. Nexus Artifact Uploader
+3. Docker
+4. docker-build-step
+5. docker pipeline
+6. OWASP Dependency-Check
+7. Eclipse Temurin installer
+8. Pipeline Maven Integration
+ 
+*************************--------------------Now configure tool that we have install plugin -----------------------************************
+Jdk-17  -jdk17.09+9
+
+jenkins-> tools-> add openjdk-21-jre -> install automatically-> Install from adoptium.net -jdk21.09+10    
+jenkins-> tools-> add Jdk-17 -> install automatically-> Install from adoptium.net -jdk17.09+9
+   
+--> configure scanner - sonar-scanner - default version
+
+
+--> maven - maven3  ->   3.6.3
+
+--> dependency check installation - DC - 6.5.1
+
+--> docker - latest
+
+
+=======================================================================================
+
+To create a EKS cluster - 
+
+https://github.com/TechWithSajan/EKS-cluster-deployment.git
+
+======================================================================================
+Sonar -Security
+
+Sonar UI portal - >Token >- Admin- Security- Users
+
+
+---> Create credentials for sonar-token and docker-hub
+sonar-token 
+
+squ_893ee4e66e059ea3ddebca29132c4b219c61d0f3
+
+===================================================================
+
+Docker hub integrtion  in jenkins
+
+Docker login
+Docker username : 
+
+Id will be from Devloper code jenkins file 
+
+Secret text : --> docker hub pwd 
+
+ID :  dockerhub-pwd
+
+====================================================================================
+
+NVD- Api-key credintial :- 
+
+Id : nvd-api-key
+
+Key genarte using below link and create the credinatl in Jenkins 
+
+https://nvd.nist.gov/developers/request-an-api-key
+
+d1aec818-25dd-43d5-8b3f-4384f235e862
+
+================================================================================
+
+=======================================================================================
+Jenkins - Sonar - Integration
+
+Manage Jenkins -> System -> SonarQube installations
+
+Name : sonar
+Server -URL :
+http://3.109.5.205:9000/
+
+
+======================================================================================
+
+Jenkins - Nexus - Integration
+
+Open your project code and edit POM.xml for nexus configuration
+
+http://15.207.85.17:8081
+
+Manage Jenkins -> Managed files -> Add new config -> Global Maven settings.xml->  global-maven
+
+Add Line 119 in xml 
+
+ 
+      <server>
+      <id>maven-releases</id>
+      <username>admin</username>
+      <password>Parth@123456</password>
+      </server>
+
+      <server>
+      <id>maven-snapshots</id>
+      <username>admin</username>
+      <password>Parth@123456</password>
+      </server>
+
+
+
+
+================================Shopping-Ekart Deployment =======================================================
+
+https://github.com/TechWithSajan/Ekart-shoping.git
+
+=====================================================================================
+
+
+
+aws eks update-kubeconfig --region ap-south-1 --name Tech-data-cluster
+
+
+
+
+**********************************K8s Cmds *************************************
+
+
+ kubectl get node
+ kubectl get pods
+ kubectl describe pod 
+kubectl get all | grep ekart
+kubectl get deployments
+kubectl edit deployment ekart-deployment
+kubectl get svc
+kubectl describe svc ekart-shoping-ssvc
+kubectl get events --sort-by=.metadata.creationTimestamp
+kubectl get svc ekart-shoping-ssvc -o wide
+
+
+kubectl delete deployment ekart-deployment
+kubectl delete service ekart-shoping-ssvc

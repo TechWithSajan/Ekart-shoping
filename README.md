@@ -15,7 +15,6 @@
   <img src="https://img.shields.io/badge/GitHub-Source%20Code-black?style=for-the-badge&logo=github"/>
   <img src="https://img.shields.io/badge/Git-Version%20Control-orange?style=for-the-badge&logo=git"/>
   <img src="https://img.shields.io/badge/Maven-Build%20Tool-red?style=for-the-badge&logo=apachemaven"/>
-  <img src="https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk"/>
 
   <!-- Security -->
   <img src="https://img.shields.io/badge/SonarQube-Code%20Quality-brightgreen?style=for-the-badge&logo=sonarqube"/>

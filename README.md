@@ -82,7 +82,6 @@ sudo systemctl enable jenkins
 
 ### Install Docker
 
-```bash
 sudo apt install docker.io -y
 sudo usermod -aG docker jenkins
 sudo systemctl restart docker
